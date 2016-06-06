@@ -35,11 +35,28 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/profile.html');
 		});
+		
+	app.route('/api/whoami')
+		.get(function (req, res) {
+			var language =req.headers['accept-language'].split(",")[0]; 
+			var startIndex= req.headers['user-agent'].indexOf("(")+1;
+			var endIndex= req.headers['user-agent'].indexOf(")");
+			var software = req.headers['user-agent'].substring(startIndex,endIndex);
+			var data = {
+				ipaddress: req.headers['x-forwarded-for'],
+				language: language,
+				software: software
+			}
+			res.json(data);
+			
+		});
 
 	app.route('/api/:id')
 		.get(isLoggedIn, function (req, res) {
 			res.json(req.user.github);
 		});
+	
+	
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
